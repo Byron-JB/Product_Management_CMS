@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -46,11 +49,28 @@ public static class Extensions
 
     public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
+        // Configure OpenTelemetry logging provider so logs can be exported to OTLP
         builder.Logging.AddOpenTelemetry(logging =>
         {
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
         });
+
+        // Configure Serilog as the primary logger for the host and enrich logs with environment/process info.
+        var serilogConfig = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .Enrich.WithEnvironmentName()
+            .Enrich.WithMachineName()
+            .Enrich.WithProcessId()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
+            .WriteTo.Console(theme: AnsiConsoleTheme.Code);
+
+        Log.Logger = serilogConfig.CreateLogger();
+
+        // Replace default logging providers with Serilog provider so structured logs are emitted.
+        builder.Logging.ClearProviders();
+        builder.Logging.AddProvider(new Serilog.Extensions.Logging.SerilogLoggerProvider(Log.Logger, dispose: true));
 
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
@@ -75,16 +95,39 @@ public static class Extensions
 
         builder.AddOpenTelemetryExporters();
 
+        // Also enable collection of metrics and traces for scraping by local Aspire or export to Grafana Cloud.
+
         return builder;
     }
 
     private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+        // Determine exporter endpoint based on environment:
+        // - Development: prefer ASPIRE_OTLP_ENDPOINT (local Aspire/collector) or fallback to http://localhost:4317
+        // - Non-development: use OTEL_EXPORTER_OTLP_ENDPOINT (e.g., Grafana Cloud endpoint)
+        var endpoint = builder.Environment.IsDevelopment()
+            ? builder.Configuration["ASPIRE_OTLP_ENDPOINT"] ?? builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://localhost:4317"
+            : builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
 
-        if (useOtlpExporter)
+        if (!string.IsNullOrWhiteSpace(endpoint))
         {
-            builder.Services.AddOpenTelemetry().UseOtlpExporter();
+            // Configure OtlpExporterOptions via DI so UseOtlpExporter picks them up
+            try
+            {
+                var uri = new Uri(endpoint);
+                builder.Services.Configure<OpenTelemetry.Exporter.OtlpExporterOptions>(opts =>
+                {
+                    opts.Endpoint = uri;
+                    var headers = builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+                    if (!string.IsNullOrWhiteSpace(headers)) opts.Headers = headers;
+                });
+
+                builder.Services.AddOpenTelemetry().UseOtlpExporter();
+            }
+            catch
+            {
+                // ignore malformed endpoint
+            }
         }
 
         // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
