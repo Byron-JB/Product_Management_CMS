@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Domain.Entities
@@ -12,9 +13,23 @@ namespace Domain.Entities
     {
         [Key]
         public int iId { get; set; }
-        public int iAddedBY { get; set; }
+
+        // FK to the user who created the record
+        [Required]
+        public int iAddedBy { get; set; }
+
         public DateTime dtCreatedDate { get; set; }
-        public string iModifiedBy { get; set; }
+
+        // Nullable FK to the user who last modified the record
+        public int? iModifiedBy { get; set; }
+
         public DateTime dtModifiedDate { get; set; }
+
+        // Navigation properties to the user who added/modified the entity
+        [ForeignKey(nameof(iAddedBy))]
+        public virtual User AddedByUser { get; set; }
+
+        [ForeignKey(nameof(iModifiedBy))]
+        public virtual User ModifiedByUser { get; set; }
     }
 }
