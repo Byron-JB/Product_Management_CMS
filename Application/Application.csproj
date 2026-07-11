@@ -8,5 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\ProductSize\" />
+    <Folder Include="Features\ProductType\" />
+    <Folder Include="Features\Product\" />
+    <Folder Include="Features\User\" />
+  </ItemGroup>
 
 </Project>
