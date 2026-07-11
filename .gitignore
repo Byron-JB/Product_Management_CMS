@@ -1,0 +1,20 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Product_Management_CMS.slnx
+/Application/bin/Debug/net10.0
+/Application/obj
+/CMS/CMS/bin/Debug/net10.0
+/CMS/CMS/obj
+/CMS/CMS.Client/bin/Debug/net10.0
+/CMS/CMS.Client/obj
+/Domain/bin/Debug/net10.0
+/Domain/obj
+/Infrastructure/bin/Debug/net10.0
+/Infrastructure/obj
+/Product_Management_CMS.AppHost/bin/Debug/net10.0
+/Product_Management_CMS.AppHost/obj
+/Product_Management_CMS.ServiceDefaults/bin/Debug/net10.0
+/Product_Management_CMS.ServiceDefaults/obj
+/.vs/Product_Management_CMS/CopilotIndices/18.7.1253.33689
