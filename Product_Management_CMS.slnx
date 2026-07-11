@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Application/Application.csproj" />
+  <Project Path="CMS/CMS.Client/CMS.Client.csproj" />
+  <Project Path="CMS/CMS/CMS.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="Product_Management_CMS.AppHost/AppHost.csproj" />
+  <Project Path="Product_Management_CMS.ServiceDefaults/.ServiceDefaults.csproj" />
+</Solution>
