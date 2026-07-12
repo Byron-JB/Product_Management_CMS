@@ -18,6 +18,8 @@ namespace Infrastructure
             // Register repositories
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+            services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }
