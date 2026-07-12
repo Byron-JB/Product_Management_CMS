@@ -14,9 +14,9 @@ namespace Domain.Entities
         [Key]
         public int iId { get; set; }
 
-        // FK to the user who created the record
-        [Required]
-        public int iAddedBy { get; set; }
+
+        // FK to the user who created the record (nullable to allow system seeding)
+        public int? iAddedBy { get; set; }
 
         public DateTime dtCreatedDate { get; set; }
 
