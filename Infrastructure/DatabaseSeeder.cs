@@ -1,8 +1,8 @@
-using Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
+using Domain.Entities;
 
 namespace Infrastructure
 {
@@ -19,11 +19,9 @@ namespace Infrastructure
 
         public async Task EnsureSeedAsync()
         {
-            // Ensure database exists
-            await _db.Database.EnsureCreatedAsync();
-
+            await _db.Database.MigrateAsync();
             // Seed admin if no users
-            if (await _db.Users.AnyAsync() == false)
+            if (!await _db.Users.AnyAsync())
             {
                 _logger.LogInformation("Seeding initial admin user");
                 var admin = new User
