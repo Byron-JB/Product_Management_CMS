@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,13 +14,14 @@ namespace Infrastructure
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
 
             // Register repositories
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
             services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
             services.AddScoped<DatabaseSeeder>();
 
             return services;
