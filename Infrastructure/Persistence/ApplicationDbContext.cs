@@ -19,6 +19,7 @@ namespace Infrastructure.Persistence
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<Activity> Activities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,15 @@ namespace Infrastructure.Persistence
                 // Audit relations
                 b.HasOne(u => u.AddedByUser).WithMany().HasForeignKey(u => u.iAddedBy).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne(u => u.ModifiedByUser).WithMany().HasForeignKey(u => u.iModifiedBy).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Activity
+            modelBuilder.Entity<Activity>(b =>
+            {
+                b.HasKey(a => a.iId);
+                b.Property(a => a.strEntityName).HasMaxLength(200);
+                b.Property(a => a.strAction).HasMaxLength(50);
+                b.Property(a => a.dtTimestamp).HasDefaultValueSql("GETUTCDATE()");
             });
 
             // ProductType
