@@ -6,13 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="11.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.6.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.6.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\ProductSize\" />
-    <Folder Include="Features\ProductType\" />
-    <Folder Include="Features\Product\" />
-    <Folder Include="Features\User\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
